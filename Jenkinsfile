@@ -1,41 +1,55 @@
 pipeline {
     agent any
+
+    tools {
+        // Install the Maven version configured as "M3" and add it to the path.
+        maven "maven_s/w"
+    }
+
     stages {
-        stage('Build Project') {
+        stage('Build') {
             steps {
-                git url: 'https://github.com/PavithraVD/pro1/', branch: 'master'
-                sh 'mvn clean package'
-            }
+                // Get some code from a GitHub repository
+                git 'https://github.com/PavithraVD/pro1/'
+
+                // Run Maven on a Unix agent.
+                sh "mvn -Dmaven.test.failure.ignore=true clean package"
+
+            }        
         }
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    sh 'docker build -t ammu2509/staragileprojectfinance:v1 .'
-                    sh 'docker images'
-                }
+       stage('Generate Test Reports') {
+           steps {
+               publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '/var/lib/jenkins/workspace/Care-Health/target/surefire-reports', reportFiles: 'index.html', reportName: 'HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+                    }
             }
-        }
-        stage('Deploy Docker Container') {
-            steps {
-                script {
-                    sh 'sudo docker run -itd --name My-first-container -p 8090:8081 ammu2509/staragileprojectfinance:v1'
-                }
-            }
-        }
-        stage('Config & Deployment with Terraform') {
-            steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', 
-                                  accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
-                                  secretKeyVariable: 'AWS_SECRET_ACCESS_KEY', 
-                                  credentialsId: 'AwsAccessKey']]) {
-                    dir('terraform-files') {
-                        sh 'sudo chmod 600 tomcat.pem'
-                        sh 'terraform init'
-                        sh 'terraform validate'
-                        sh 'terraform apply --auto-approve'
+       stage('Create Docker Image') {
+           steps {
+               sh 'docker build -t ammu2509/staragileprojectfinance:v1'
                     }
                 }
-            }
-        }
+       stage('Docker-Login') {
+           steps {
+               withCredentials([usernamePassword(credentialsId: 'Docker-login', passwordVariable: 'dockerpassword', usernameVariable: 'dockerlogin')]) {
+               sh 'docker login -u ${dockerlogin} -p ${dockerpassword}'
+                                   }
+                        }
+                }
+       stage('Push-Image') {
+           steps {
+               sh 'docker push ammu2509/staragileprojectfinance:v1'
+                     }
+                }
+       stage('Config & Deployment') {
+            steps {
+                withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsAccessKey', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                    dir('terraform-files') {
+                    sh 'sudo chmod 600 keypair2.pem'
+                    sh 'terraform init'
+                    sh 'terraform validate'
+                    sh 'terraform apply --auto-approve'
+}
     }
+}
+}
+}
 }
