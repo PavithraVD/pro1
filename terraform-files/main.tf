@@ -2,7 +2,7 @@ resource "aws_instance" "test-server" {
   ami = "ami-0522ab6e1ddcc7055"
   instance_type = "t2.micro"
   key_name = "tomcat"
-  vpc_security_group_ids = ["sg-0624c6a8b6420566d"]
+  vpc_security_group_ids = ["sg-044f5615389b77f0c"]
   connection {
      type = "ssh"
      user = "ubuntu"
@@ -19,6 +19,6 @@ resource "aws_instance" "test-server" {
      command = "echo ${aws_instance.test-server.public_ip} > inventory"
      }
   provisioner "local-exec" {
-     command = "ansible-playbook /var/lib/jenkins/workspace/Care-Health/terraform-files/ansibleplaybook.yml"
+     command = "ansible-playbook /var/lib/jenkins/workspace/project/terraform-files/ansibleplaybook.yml"
      }
   }
