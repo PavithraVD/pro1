@@ -1,41 +1,41 @@
 pipeline {
     agent any
-    stages{
-        stage('build project'){
-            steps{
-                git url:'https://github.com/PavithraVD/pro1/', branch: "master"
+    stages {
+        stage('Build Project') {
+            steps {
+                git url: 'https://github.com/PavithraVD/pro1/', branch: 'master'
                 sh 'mvn clean package'
-              
             }
         }
-        stage('Build docker image'){
-            steps{
-                script{
+        stage('Build Docker Image') {
+            steps {
+                script {
                     sh 'docker build -t ammu2509/staragileprojectfinance:v1 .'
                     sh 'docker images'
                 }
             }
         }
-         
-        
-     stage('Deploy') {
+        stage('Deploy Docker Container') {
             steps {
-                sh 'sudo docker run -itd --name My-first-container -p 8090:8081 ammu2509/staragileprojectfinance:v1'
-                  
+                script {
+                    sh 'sudo docker run -itd --name My-first-container -p 8090:8081 ammu2509/staragileprojectfinance:v1'
                 }
             }
-     
-      stage('Config & Deployment') {
+        }
+        stage('Config & Deployment with Terraform') {
             steps {
-                withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsAccessKey', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                     dir('terraform-files') {
-                    sh 'sudo chmod 600 tomcat.pem'
-                    sh 'terraform init'
-                    sh 'terraform validate'
-                    sh 'terraform apply --auto-approve'
-}
-}
-}
-}
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', 
+                                  accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
+                                  secretKeyVariable: 'AWS_SECRET_ACCESS_KEY', 
+                                  credentialsId: 'AwsAccessKey']]) {
+                    dir('terraform-files') {
+                        sh 'sudo chmod 600 tomcat.pem'
+                        sh 'terraform init'
+                        sh 'terraform validate'
+                        sh 'terraform apply --auto-approve'
+                    }
+                }
+            }
+        }
     }
 }
