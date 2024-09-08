@@ -44,7 +44,7 @@ pipeline {
         }
         stage('Config & Deployment') {
             steps {
-                withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsAccessKey', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AwsAccessKey1', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     dir('terraform-files') {
                     sh 'sudo chmod 600 tomcat.pem'
                     sh 'terraform init'
