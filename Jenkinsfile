@@ -23,7 +23,7 @@ pipeline {
             }
        stage('Create Docker Image') {
            steps {
-               sh 'docker build -t ammu2509/staragileprojectfinancee:v1'
+               sh 'docker build -t ammu2509/banking-project .'
                     }
                 }
        stage('Docker-Login') {
@@ -35,7 +35,7 @@ pipeline {
                 }
        stage('Push-Image') {
            steps {
-               sh 'docker push ammu2509/staragileprojectfinancee:v1'
+               sh 'docker push ammu2509/banking-project .'
                      }
                 }
        stage('Config & Deployment') {
