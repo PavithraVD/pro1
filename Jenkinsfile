@@ -19,8 +19,7 @@ pipeline {
         }
        stage('Generate Test Reports') {
            steps {
-               publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '/var/lib/jenkins/workspace/project/target/surefire-reports', reportFiles: 'index.html', reportName: 'HTML Report', reportTitles: '', useWrapperFileDirectly: true])
-                    }
+               publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '/var/lib/jenkins/workspace/Banking/target/surefire-reports', reportFiles: 'index.html', reportName: 'HTML Report', reportTitles: '', useWrapperFileDirectly: true])                    }
             }
        stage('Create Docker Image') {
            steps {
@@ -29,7 +28,7 @@ pipeline {
                 }
        stage('Docker-Login') {
            steps {
-               withCredentials([usernamePassword(credentialsId: 'cred-dock', passwordVariable: 'dockerpassword', usernameVariable: 'dockerlogin')]) {
+               withCredentials([usernamePassword(credentialsId: 'creddockkk', passwordVariable: 'dockerpassword', usernameVariable: 'dockerlogin')]) {
                    sh 'docker login -u ${dockerlogin} -p ${dockerpassword}'
                 }
                 }
