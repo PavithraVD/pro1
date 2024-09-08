@@ -1,29 +1,16 @@
-- name: Configure Docker on EC2 Instances
-  hosts: all
+- name : Configure Docker on EC2 Instances
+  hosts : all
   become: true
-  connection: ssh
-  vars:
-    ansible_python_interpreter: /usr/bin/python3
-  tasks:
-    - name: Ensure Python3 is installed
-      apt:
-        name: python3
-        state: present
-    - name: updating apt
-      command : sudo apt-get update
+  connection : ssh
+  tasks : 
+  - name: updating apt
+    command : sudo apt-get update
 
-    - name : Install Docker
-      command : sudo apt-get install -y docker.io
+  - name : Install Docker
+    command : sudo apt-get install -y docker.io
 
-    - name : Start Docker Service
-      command : sudo systemctl start docker
+  - name : Start Docker Service
+    command : sudo systemctl start docker
 
-    - name: Deploy Docker Container
-      command: docker run -itd -p 8090:8081 ammu2509/banking-project
-
-   
-    
-
- 
-
- 
+  - name: Deploy Docker Container
+    command: docker run -itd -p 8090:8081 ammu2509/banking-project
